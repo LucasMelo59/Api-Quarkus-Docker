@@ -1,13 +1,14 @@
 package io.github.lucasmelo59.exception;
 
-public class UserExceception extends Exception{
-private Long id;
+import javax.ws.rs.core.Response;
 
+public class UserExceception extends RuntimeException {
+    private String error_Message;
+    private Response.Status status;
 
-    public void usuario(Long id) {
-    if ( id == null){
-        throw new NullPointerException("Aluno nulo");
-    }
+    public UserExceception(String error_Message, Response.Status status) {
+        super(error_Message);
+        this.status = status;
     }
 
 

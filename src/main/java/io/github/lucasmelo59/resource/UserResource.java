@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Optional;
 
 @Path("/users")
 
@@ -29,47 +30,36 @@ public class UserResource {
     @POST
     @Transactional
     public Response createUsers(CreatingUser creatingUser) {
-        User user = new User();
-        user.setAge(creatingUser.getAge());
-        user.setNome(creatingUser.getName());
-        repository.persist(user);
-        return Response.ok(user).build();
+        return Response.ok(service.create(creatingUser)).build();
     }
 
     @GET
     public Response listallUsers() {
-        PanacheQuery<User> query = repository.findAll();
-        return Response.ok(query.list()).build();
+
+        return Response.ok(service.listALL()).build();
     }
 
     @DELETE
     @Path("{id}")
     @Transactional
-    public Response deleteUser(@PathParam("id") Long id) {
-        User user = repository.findById(id);
-        if (user != null) {
-            repository.delete(user);
-            return Response.ok().build();
-
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
-
+    public void deleteUser(@PathParam("id") Long id) {
+        service.delete(id);
     }
 
     @GET
     @Path("{id}")
     @Transactional
     public User usuario(@PathParam("id") Long id) {
-        return service.usuarios(id).orElseThrow(() -> new NullPointerException("oi"));
+        return service.usuarios(id).orElseThrow(() -> new UserExceception("oi", Response.Status.NO_CONTENT));
     }
 
 
     @PUT
     @Path("{id}")
     @Transactional
-    public Response updateUser(@PathParam("id") Long id, CreatingUser userData) {
+    public User updateUser(@PathParam("id") Long id, CreatingUser userData) {
 
-        return service.atualizar(id).
+        return service.atualizar(id,userData).orElseThrow(() -> new UserExceception("errado", Response.Status.NO_CONTENT));
     }
 
 
