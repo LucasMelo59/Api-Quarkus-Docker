@@ -1,13 +1,11 @@
-package io.github.lucasmelo59.quarkussource.domain.model;
-
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+package io.github.lucasmelo59.model;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
 @Table(name = "users")
-public class User extends PanacheEntityBase {
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long Id;
@@ -19,6 +17,7 @@ public class User extends PanacheEntityBase {
     public long getId() {
         return Id;
     }
+
 
     public void setId(long id) {
         Id = id;

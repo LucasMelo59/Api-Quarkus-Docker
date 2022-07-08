@@ -1,12 +1,15 @@
-package io.github.lucasmelo59.quarkussource.rest;
+package io.github.lucasmelo59.resource;
 
-import io.github.lucasmelo59.quarkussource.domain.model.User;
-import io.github.lucasmelo59.quarkussource.domain.repository.UserRepository;
-import io.github.lucasmelo59.quarkussource.rest.dto.CreatingUser;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.github.lucasmelo59.exception.UserExceception;
+import io.github.lucasmelo59.model.User;
+import io.github.lucasmelo59.repository.UserRepository;
+import io.github.lucasmelo59.dto.CreatingUser;
+import io.github.lucasmelo59.service.UserService;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.quarkus.hibernate.orm.panache.PanacheQuery;
-import io.quarkus.panache.common.exception.PanacheQueryException;
+import org.hibernate.annotations.NotFound;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -18,23 +21,24 @@ import javax.ws.rs.core.Response;
 
 @Produces({MediaType.APPLICATION_JSON})
 
-public class CreateUser {
-
-    public CreateUser (UserRepository repository){}
-
+public class UserResource {
+    @Inject
+    UserRepository repository;
+    @Inject
+   UserService service;
     @POST
     @Transactional
     public Response createUsers(CreatingUser creatingUser) {
         User user = new User();
         user.setAge(creatingUser.getAge());
         user.setNome(creatingUser.getName());
-        user.persist();
+        repository.persist(user);
         return Response.ok(user).build();
     }
 
     @GET
     public Response listallUsers() {
-        PanacheQuery<PanacheEntityBase> query = User.findAll();
+        PanacheQuery<User> query = repository.findAll();
         return Response.ok(query.list()).build();
     }
 
@@ -42,9 +46,9 @@ public class CreateUser {
     @Path("{id}")
     @Transactional
     public Response deleteUser(@PathParam("id") Long id) {
-        User user = User.findById(id);
-        if( user !=  null) {
-            user.delete();
+        User user = repository.findById(id);
+        if (user != null) {
+            repository.delete(user);
             return Response.ok().build();
 
         }
@@ -52,18 +56,20 @@ public class CreateUser {
 
     }
 
+    @GET
+    @Path("{id}")
+    @Transactional
+    public User usuario(@PathParam("id") Long id) {
+        return service.usuarios(id).orElseThrow(() -> new NullPointerException("oi"));
+    }
+
+
     @PUT
     @Path("{id}")
     @Transactional
     public Response updateUser(@PathParam("id") Long id, CreatingUser userData) {
-        User user = User.findById(id);
-        if ( user != null) {
-            user.setAge(userData.getAge());
-            user.setNome(userData.getName());
-            user.persist();
-            return Response.ok().build();
-        }
-        return Response.status(Response.Status.NOT_FOUND).build();
+
+        return service.atualizar(id).
     }
 
 

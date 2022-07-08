@@ -1,4 +1,4 @@
-package io.github.lucasmelo59.quarkussource.rest.dto;
+package io.github.lucasmelo59.dto;
 
 public class CreatingUser {
     private String name;
